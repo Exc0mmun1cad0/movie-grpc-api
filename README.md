@@ -27,5 +27,5 @@ Vars:
 - `POSTGRES_HOST` - host of db *Postgres*
 - `POSTGRES_PORT` - port of db *Postgres*
 - `POSTGRES_USER` - username for *Postgres* connection
-- `POSTGRES_PASS` - password for *Postgres* connection
+- `POSTGRES_PASSWORD` - password for *Postgres* connection
 - `POSTGRES_DB` - name of *Postgres* database for connection

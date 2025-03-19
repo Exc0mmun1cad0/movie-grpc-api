@@ -21,7 +21,7 @@ type Postgres struct {
 	Host     string `env:"POSTGRES_HOST" env-default:"localhost"`
 	Port     uint16 `env:"POSTGRES_PORT" env-default:"5432"`
 	Username string `env:"POSTGRES_USER" env-required:"true"`
-	Password string `env:"POSTGRES_PASS" env-required:"true"`
+	Password string `env:"POSTGRES_PASSWORD" env-required:"true"`
 	Database string `env:"POSTGRES_DB" env-default:"postgres"`
 }
 
