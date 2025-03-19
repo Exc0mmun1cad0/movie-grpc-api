@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_movies_movie_id ON movies (movie_id);
