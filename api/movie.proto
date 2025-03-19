@@ -4,6 +4,7 @@ option go_package = "pkg/pb";
 
 service MovieSerivce {
   rpc CreateMovie(CreateMovieRequest) returns (CreateMovieResponse);
+  rpc CreateMovies(stream CreateMovieRequest) returns (CreateMovieResponse);
   rpc GetMovie(GetMovieRequest) returns (GetMovieResponse);
   rpc GetMovies(GetMoviesRequest) returns (stream GetMovieResponse);
   rpc UpdateMovie(UpdateMovieRequest) returns (UpdateMovieResponse);
