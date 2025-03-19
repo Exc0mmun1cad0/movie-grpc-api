@@ -29,3 +29,4 @@ Vars:
 - `POSTGRES_USER` - username for *Postgres* connection
 - `POSTGRES_PASSWORD` - password for *Postgres* connection
 - `POSTGRES_DB` - name of *Postgres* database for connection
+- `PGADMIN_PORT` - port for running *PGAdmin* to monitor *Postgres*
