@@ -17,3 +17,15 @@ Methods:
 - `POST` Movie(s) (unary & streaming)
 - `UPDATE` Movie
 - `DELETE` Movie
+
+## Configuration
+Service reads config from `.env` file. Here is an example in `.env.example`
+
+Vars:
+- `GRPC_PORT` - grpc server port
+- `HTTP_PORT` - http server (grpc-gateway) port
+- `POSTGRES_HOST` - host of db *Postgres*
+- `POSTGRES_PORT` - port of db *Postgres*
+- `POSTGRES_USER` - username for *Postgres* connection
+- `POSTGRES_PASS` - password for *Postgres* connection
+- `POSTGRES_DB` - name of *Postgres* database for connection
