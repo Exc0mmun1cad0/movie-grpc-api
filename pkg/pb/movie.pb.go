@@ -577,7 +577,7 @@ var file_movie_proto_rawDesc = string([]byte{
 	0x0a, 0x13, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4d, 0x6f, 0x76, 0x69, 0x65, 0x52, 0x65, 0x73,
 	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x32,
-	0x8f, 0x03, 0x0a, 0x0c, 0x4d, 0x6f, 0x76, 0x69, 0x65, 0x53, 0x65, 0x72, 0x69, 0x76, 0x63, 0x65,
+	0x8f, 0x03, 0x0a, 0x0c, 0x4d, 0x6f, 0x76, 0x69, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
 	0x12, 0x40, 0x0a, 0x0b, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x4d, 0x6f, 0x76, 0x69, 0x65, 0x12,
 	0x17, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x4d, 0x6f, 0x76, 0x69,
 	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x43,
@@ -634,18 +634,18 @@ var file_movie_proto_goTypes = []any{
 var file_movie_proto_depIdxs = []int32{
 	0, // 0: api.GetMovieResponse.movie:type_name -> api.Movie
 	0, // 1: api.UpdateMovieResponse.movie:type_name -> api.Movie
-	1, // 2: api.MovieSerivce.CreateMovie:input_type -> api.CreateMovieRequest
-	1, // 3: api.MovieSerivce.CreateMovies:input_type -> api.CreateMovieRequest
-	3, // 4: api.MovieSerivce.GetMovie:input_type -> api.GetMovieRequest
-	4, // 5: api.MovieSerivce.GetMovies:input_type -> api.GetMoviesRequest
-	6, // 6: api.MovieSerivce.UpdateMovie:input_type -> api.UpdateMovieRequest
-	8, // 7: api.MovieSerivce.DeleteMovie:input_type -> api.DeleteMovieRequest
-	2, // 8: api.MovieSerivce.CreateMovie:output_type -> api.CreateMovieResponse
-	2, // 9: api.MovieSerivce.CreateMovies:output_type -> api.CreateMovieResponse
-	5, // 10: api.MovieSerivce.GetMovie:output_type -> api.GetMovieResponse
-	5, // 11: api.MovieSerivce.GetMovies:output_type -> api.GetMovieResponse
-	7, // 12: api.MovieSerivce.UpdateMovie:output_type -> api.UpdateMovieResponse
-	9, // 13: api.MovieSerivce.DeleteMovie:output_type -> api.DeleteMovieResponse
+	1, // 2: api.MovieService.CreateMovie:input_type -> api.CreateMovieRequest
+	1, // 3: api.MovieService.CreateMovies:input_type -> api.CreateMovieRequest
+	3, // 4: api.MovieService.GetMovie:input_type -> api.GetMovieRequest
+	4, // 5: api.MovieService.GetMovies:input_type -> api.GetMoviesRequest
+	6, // 6: api.MovieService.UpdateMovie:input_type -> api.UpdateMovieRequest
+	8, // 7: api.MovieService.DeleteMovie:input_type -> api.DeleteMovieRequest
+	2, // 8: api.MovieService.CreateMovie:output_type -> api.CreateMovieResponse
+	2, // 9: api.MovieService.CreateMovies:output_type -> api.CreateMovieResponse
+	5, // 10: api.MovieService.GetMovie:output_type -> api.GetMovieResponse
+	5, // 11: api.MovieService.GetMovies:output_type -> api.GetMovieResponse
+	7, // 12: api.MovieService.UpdateMovie:output_type -> api.UpdateMovieResponse
+	9, // 13: api.MovieService.DeleteMovie:output_type -> api.DeleteMovieResponse
 	8, // [8:14] is the sub-list for method output_type
 	2, // [2:8] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

@@ -2,7 +2,7 @@ syntax = "proto3";
 package api;
 option go_package = "pkg/pb";
 
-service MovieSerivce {
+service MovieService {
   rpc CreateMovie(CreateMovieRequest) returns (CreateMovieResponse);
   rpc CreateMovies(stream CreateMovieRequest) returns (CreateMovieResponse);
   rpc GetMovie(GetMovieRequest) returns (GetMovieResponse);
