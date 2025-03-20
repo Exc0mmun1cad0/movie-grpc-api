@@ -5,7 +5,6 @@ import (
 	"errors"
 	"order-service/internal/model"
 	repo "order-service/internal/repository"
-	"order-service/internal/transport/dto"
 	"order-service/pkg/pb"
 
 	"google.golang.org/grpc"
@@ -33,12 +32,7 @@ func Register(gRPCServer *grpc.Server, service Service) {
 
 func (srv *server) CreateMovie(ctx context.Context, in *pb.CreateMovieRequest) (*pb.CreateMovieResponse, error) {
 	// TODO: add validation
-	newMovie := dto.CreateMovieRequest{
-		Title:    in.GetTitle(),
-		Genre:    in.GetGenre(),
-		Director: in.GetDirector(),
-		Year:     in.GetYear(),
-	}
+	newMovie := pbToCreate(in)
 
 	newID, err := srv.service.CreateMovie(newMovie.ToModel())
 	if err != nil {
