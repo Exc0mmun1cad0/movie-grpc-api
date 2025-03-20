@@ -3,6 +3,7 @@ package moviegrpc
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"movie-service/internal/model"
 	repo "movie-service/internal/repository"
 	"movie-service/pkg/pb"
@@ -24,12 +25,14 @@ type Service interface {
 
 type server struct {
 	pb.UnimplementedMovieServiceServer
+	l        *slog.Logger
 	service  Service
 	validate *validator.Validate
 }
 
-func Register(gRPCServer *grpc.Server, service Service) {
+func Register(gRPCServer *grpc.Server, log *slog.Logger, service Service) {
 	pb.RegisterMovieServiceServer(gRPCServer, &server{
+		l:        log,
 		service:  service,
 		validate: validator.New(validator.WithRequiredStructEnabled()),
 	})
