@@ -6,11 +6,11 @@ type CreateMovieRequest struct {
 	Title    string
 	Genre    string
 	Director string
-	Year     uint
+	Year     uint32
 }
 
-func (req *CreateMovieRequest) ToModel() model.Movie {
-	return model.Movie{
+func (req *CreateMovieRequest) ToModel() *model.Movie {
+	return &model.Movie{
 		Title:    req.Title,
 		Genre:    req.Genre,
 		Director: req.Director,
@@ -19,13 +19,18 @@ func (req *CreateMovieRequest) ToModel() model.Movie {
 }
 
 type UpdateMovieRequest struct {
+	ID       string
 	Title    string
 	Genre    string
 	Director string
-	Year     uint
+	Year     uint32
 }
 
-func (req *UpdateMovieRequest) ToModel() model.Movie {
-	panic("implement me")
-	return model.Movie{}
+func (req *UpdateMovieRequest) ToModel() *model.Movie {
+	return &model.Movie{
+		Title:    req.Title,
+		Genre:    req.Genre,
+		Director: req.Director,
+		Year:     req.Year,
+	}
 }
