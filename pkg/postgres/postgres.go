@@ -3,6 +3,7 @@ package postgres
 import (
 	"errors"
 	"fmt"
+	"log"
 	"movie-service/internal/config"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -48,4 +49,12 @@ func New(cfg config.Postgres) (*sqlx.DB, error) {
 	}
 
 	return conn, nil
+}
+
+func MustClose(db *sqlx.DB) {
+	const op = "postgres.MustClose"
+
+	if err := db.Close(); err != nil {
+		log.Fatalf("%s: failed to close psotgres connection: %v", op, err)
+	}
 }
