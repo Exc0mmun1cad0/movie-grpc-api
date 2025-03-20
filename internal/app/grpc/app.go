@@ -8,6 +8,8 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 type App struct {
@@ -30,9 +32,14 @@ func New(ctx context.Context, log *slog.Logger, movieService moviegrpc.Service, 
 			}),
 	)
 
+	// Register movie service
 	moviegrpc.Register(gRPCServer, log, movieService)
 
 	// TODO: add healthcheck
+	// Register health check service
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(gRPCServer, healthServer)
+	healthServer.SetServingStatus("movie-service", grpc_health_v1.HealthCheckResponse_SERVING)
 
 	return &App{
 		ctx:        ctx,
