@@ -13,6 +13,7 @@ type Config struct {
 }
 
 type MovieService struct {
+	Env string `yaml:"env" env:"ENV" env-default:"prod"`
 	HTTPPort uint16 `yaml:"http_port" env:"HTTP_PORT" env-default:"8088"`
 	GRPCPort uint16 `yaml:"grpc_port" env:"GRPC_PORT" env-default:"50051"`
 }
