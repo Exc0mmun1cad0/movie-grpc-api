@@ -7,6 +7,7 @@ import (
 	"movie-service/internal/model"
 	repo "movie-service/internal/repository"
 	"movie-service/pkg/pb"
+	"movie-service/pkg/sl"
 
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
@@ -39,33 +40,63 @@ func Register(gRPCServer *grpc.Server, log *slog.Logger, service Service) {
 }
 
 func (srv *server) CreateMovie(ctx context.Context, in *pb.CreateMovieRequest) (*pb.CreateMovieResponse, error) {
+	const op = "transport.grpc.CreateMovie"
+
+	log := srv.l.With(
+		slog.String("op", op),
+		slog.Any("request_id", ctx.Value("request_id")), // TODO: replace request_id with constant init-ed near the interceptor
+	)
+
 	newMovie := pbToCreate(in)
+	log.Debug("Converted CreateMovieRequest to dto", slog.Any("Request", newMovie))
 
 	// Create request validation
+	log.Debug("Validating CreateMovieRequest")
 	if err := srv.validate.Struct(newMovie); err != nil {
+		log.Error("Validation failed", sl.Err(err))
+
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	// Add info about new movie to repository through the service layer
+	log.Debug("Creating movie")
 	newID, err := srv.service.CreateMovie(newMovie.ToModel())
 	if err != nil {
+		log.Error("Failed to create movie", sl.Err(err))
+
 		return nil, status.Error(codes.Internal, "failed to add movie info")
 	}
+
+	log.Debug("Successfully created movie info", slog.String("movie_id", newID))
 
 	return &pb.CreateMovieResponse{Id: newID}, nil
 }
 
 func (srv *server) GetMovie(ctx context.Context, in *pb.GetMovieRequest) (*pb.GetMovieResponse, error) {
+	const op = "transport.grpc.GetMovie"
+
+	log := srv.l.With(
+		slog.String("op", op),
+		slog.Any("request_id", ctx.Value("request_id")), // TODO: replace request_id with constant init-ed near the interceptor
+	)
+
 	id := in.GetId()
+	log.Debug("Got movie ID", slog.String("ID", id))
 
 	// Check whether it's valid uuid
+	log.Debug("Validating movie ID")
 	if err := srv.validate.Var(id, "uuid"); err != nil {
+		log.Error("Validation failed", sl.Err(err))
+
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	// Get movie info from repository through the service layer
+	log.Debug("Getting movie info by ID")
 	movie, err := srv.service.GetMovie(id)
 	if err != nil {
+		log.Error("Failed to get movie info", sl.Err(err))
+
 		if errors.Is(err, repo.ErrMovieNotExists) {
 			return nil, status.Error(codes.NotFound, "movie not found")
 		}
@@ -73,20 +104,36 @@ func (srv *server) GetMovie(ctx context.Context, in *pb.GetMovieRequest) (*pb.Ge
 		return nil, status.Error(codes.Internal, "failed to get movie info")
 	}
 
+	log.Debug("Successfully found movie info", slog.Any("Movie", movie))
+
 	return &pb.GetMovieResponse{Movie: toPb(movie)}, nil
 }
 
 func (srv *server) UpdateMovie(ctx context.Context, in *pb.UpdateMovieRequest) (*pb.UpdateMovieResponse, error) {
+	const op = "transport.grpc.UpdateMovie"
+
+	log := srv.l.With(
+		slog.String("op", op),
+		slog.Any("request_id", ctx.Value("request_id")), // TODO: replace request_id with constant init-ed near the interceptor
+	)
+
 	movie := pbToUpdate(in)
+	log.Debug("Converted UpdateMovieRequest to dto", slog.Any("request", movie))
 
 	// Update request validation
+	log.Debug("Validating UpdateMovieRequest")
 	if err := srv.validate.Struct(movie); err != nil {
+		log.Error("Validation failed", sl.Err(err))
+
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	// Update movie info in repository through the service layer
+	log.Debug("Updating movie info")
 	newMovie, err := srv.service.UpdateMovie(movie.ID, movie.ToModel())
 	if err != nil {
+		log.Error("Failed to update movie info", sl.Err(err))
+
 		if errors.Is(err, repo.ErrMovieNotExists) {
 			return nil, status.Error(codes.NotFound, "movie not found")
 		}
@@ -94,21 +141,43 @@ func (srv *server) UpdateMovie(ctx context.Context, in *pb.UpdateMovieRequest) (
 		return nil, status.Error(codes.Internal, "failed to update movie info")
 	}
 
+	log.Debug("Successfully updated movie info", slog.Any("New movie", newMovie))
+
 	return &pb.UpdateMovieResponse{Movie: toPb(newMovie)}, nil
 }
 
 func (srv *server) DeleteMovie(ctx context.Context, in *pb.DeleteMovieRequest) (*pb.DeleteMovieResponse, error) {
+	const op = "transport.grpc.DeleteMovie"
+
+	log := srv.l.With(
+		slog.String("op", op),
+		slog.Any("request_id", ctx.Value("request_id")), // TODO: replace request_id with constant init-ed near the interceptor
+	)
+
 	id := in.GetId()
+	log.Debug("Got movie ID", slog.String("ID", id))
 
 	// Check whether it's valid uuid
+	log.Debug("Validating movie ID")
 	if err := srv.validate.Var(id, "uuid"); err != nil {
+		log.Error("validation failed", sl.Err(err))
+
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	// Delete movie info from repository through the service layer
+	log.Debug("Deleting movie info by ID")
 	ok, err := srv.service.DeleteMovie(id)
 	if err != nil && !errors.Is(err, repo.ErrMovieNotExists) {
+		log.Error("Failed to delete movie info", sl.Err(err))
+
 		return nil, status.Error(codes.Internal, "failed to delete movie info")
+	}
+
+	if ok {
+		log.Debug("Succesfully deleted movie info")
+	} else {
+		log.Debug("No movie with this ID was found", slog.String("ID", id))
 	}
 
 	return &pb.DeleteMovieResponse{Success: ok}, nil
