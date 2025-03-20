@@ -29,7 +29,7 @@ func pbToUpdate(in *pb.UpdateMovieRequest) *dto.UpdateMovieRequest {
 	return &dto.UpdateMovieRequest{
 		ID:       in.GetId(),
 		Title:    in.GetTitle(),
-		Genre:    in.GetTitle(),
+		Genre:    in.GetGenre(),
 		Director: in.GetDirector(),
 		Year:     in.GetYear(),
 	}
