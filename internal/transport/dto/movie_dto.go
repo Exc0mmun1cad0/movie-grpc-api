@@ -3,10 +3,10 @@ package dto
 import "movie-service/internal/model"
 
 type CreateMovieRequest struct {
-	Title    string
-	Genre    string
-	Director string
-	Year     uint32
+	Title    string `validate:"required"`
+	Genre    string `validate:"required"`
+	Director string `validate:"required"`
+	Year     uint32 `validate:"required,gte=1911"`
 }
 
 func (req *CreateMovieRequest) ToModel() *model.Movie {
@@ -19,11 +19,11 @@ func (req *CreateMovieRequest) ToModel() *model.Movie {
 }
 
 type UpdateMovieRequest struct {
-	ID       string
-	Title    string
-	Genre    string
-	Director string
-	Year     uint32
+	ID       string `validate:"required,uuid"`
+	Title    string `validate:"omitempty"`
+	Genre    string `validate:"omitempty"`
+	Director string `validate:"omitempty"`
+	Year     uint32 `validate:"omitempty,gte=1911"`
 }
 
 func (req *UpdateMovieRequest) ToModel() *model.Movie {
