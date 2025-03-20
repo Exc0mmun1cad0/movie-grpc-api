@@ -37,7 +37,7 @@ func (r *Repository) GetMovie(id string) (*model.Movie, error) {
 	}
 
 	var movie model.Movie
-	err = r.db.Get(&movie, query, args)
+	err = r.db.Get(&movie, query, args...)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("%s: failed to get movie info by id: %w", op, repo.ErrMovieNotExists)
