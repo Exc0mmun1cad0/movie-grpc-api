@@ -30,7 +30,6 @@ func (r *Repository) GetMovie(id string) (*model.Movie, error) {
 	query, args, err := r.builder.Select("*").
 		From("movies").
 		Where(sq.Eq{"movie_id": id}).
-		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to form sql query: %w", op, err)
@@ -75,7 +74,6 @@ func (r *Repository) CreateMovie(movie *model.Movie) (string, error) {
 		Columns("title", "genre", "director", "year").
 		Values(movie.Title, movie.Genre, movie.Director, movie.Year).
 		Suffix("RETURNING movie_id").
-		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
 		return "", fmt.Errorf("%s: failed to form sql query: %w", op, err)
@@ -130,13 +128,17 @@ func (r *Repository) UpdateMovie(id string, movie *model.Movie) (*model.Movie, e
 		builder = builder.Set("year", movie.Year)
 	}
 
-	query, args, err := builder.ToSql()
+	query, args, err := builder.
+		Where(sq.Eq{"movie_id": id}).
+		Suffix("RETURNING *").
+		ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to form query: %w", op, err)
 	}
 
 	var newMovie model.Movie
 	err = r.db.Get(&newMovie, query, args...)
+
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("%s: failed to update movie info: %w", op, repo.ErrMovieNotExists)
@@ -154,7 +156,6 @@ func (r *Repository) DeleteMovie(id string) (bool, error) {
 
 	query, args, err := r.builder.Delete("movies").
 		Where(sq.Eq{"movie_id": id}).
-		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
 		return false, fmt.Errorf("%s: failed to form query: %w", op, err)
