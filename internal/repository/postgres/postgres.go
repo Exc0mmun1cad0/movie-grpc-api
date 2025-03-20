@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"order-service/internal/model"
-	repo "order-service/internal/repository"
+	"movie-service/internal/model"
+	repo "movie-service/internal/repository"
 
 	"github.com/jmoiron/sqlx"
 

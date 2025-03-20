@@ -1,6 +1,6 @@
 package movieservice
 
-import "order-service/internal/model"
+import "movie-service/internal/model"
 
 type movieRepo interface {
 	GetMovie(id string) (*model.Movie, error)

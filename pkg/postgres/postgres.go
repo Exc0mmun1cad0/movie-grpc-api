@@ -3,7 +3,7 @@ package postgres
 import (
 	"errors"
 	"fmt"
-	"order-service/internal/config"
+	"movie-service/internal/config"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/jmoiron/sqlx"

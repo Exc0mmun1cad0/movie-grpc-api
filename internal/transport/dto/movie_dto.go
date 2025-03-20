@@ -1,6 +1,6 @@
 package dto
 
-import "order-service/internal/model"
+import "movie-service/internal/model"
 
 type CreateMovieRequest struct {
 	Title    string

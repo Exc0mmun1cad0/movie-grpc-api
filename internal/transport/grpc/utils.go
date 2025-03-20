@@ -1,9 +1,9 @@
 package moviegrpc
 
 import (
-	"order-service/internal/model"
-	"order-service/internal/transport/dto"
-	"order-service/pkg/pb"
+	"movie-service/internal/model"
+	"movie-service/internal/transport/dto"
+	"movie-service/pkg/pb"
 )
 
 func toPb(movie *model.Movie) *pb.Movie {

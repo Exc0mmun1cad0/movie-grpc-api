@@ -3,9 +3,9 @@ package moviegrpc
 import (
 	"context"
 	"errors"
-	"order-service/internal/model"
-	repo "order-service/internal/repository"
-	"order-service/pkg/pb"
+	"movie-service/internal/model"
+	repo "movie-service/internal/repository"
+	"movie-service/pkg/pb"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
