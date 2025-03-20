@@ -44,7 +44,7 @@ func (srv *server) CreateMovie(ctx context.Context, in *pb.CreateMovieRequest) (
 
 	log := srv.l.With(
 		slog.String("op", op),
-		slog.Any("request_id", ctx.Value("request_id")), // TODO: replace request_id with constant init-ed near the interceptor
+		slog.Any("request_id", ctx.Value(reqIDKey)),
 	)
 
 	newMovie := pbToCreate(in)
@@ -77,7 +77,7 @@ func (srv *server) GetMovie(ctx context.Context, in *pb.GetMovieRequest) (*pb.Ge
 
 	log := srv.l.With(
 		slog.String("op", op),
-		slog.Any("request_id", ctx.Value("request_id")), // TODO: replace request_id with constant init-ed near the interceptor
+		slog.Any("request_id", ctx.Value(reqIDKey)),
 	)
 
 	id := in.GetId()
@@ -114,7 +114,7 @@ func (srv *server) UpdateMovie(ctx context.Context, in *pb.UpdateMovieRequest) (
 
 	log := srv.l.With(
 		slog.String("op", op),
-		slog.Any("request_id", ctx.Value("request_id")), // TODO: replace request_id with constant init-ed near the interceptor
+		slog.Any("request_id", ctx.Value(reqIDKey)),
 	)
 
 	movie := pbToUpdate(in)
@@ -151,7 +151,7 @@ func (srv *server) DeleteMovie(ctx context.Context, in *pb.DeleteMovieRequest) (
 
 	log := srv.l.With(
 		slog.String("op", op),
-		slog.Any("request_id", ctx.Value("request_id")), // TODO: replace request_id with constant init-ed near the interceptor
+		slog.Any("request_id", ctx.Value(reqIDKey)),
 	)
 
 	id := in.GetId()

@@ -18,7 +18,17 @@ type App struct {
 }
 
 func New(ctx context.Context, log *slog.Logger, movieService moviegrpc.Service, port uint16) *App {
-	gRPCServer := grpc.NewServer() // TODO: add here interceptors
+	gRPCServer := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			func(
+				ctx context.Context,
+				req any,
+				info *grpc.UnaryServerInfo,
+				handler grpc.UnaryHandler,
+			) (resp any, err error) {
+				return moviegrpc.LoggingInterceptor(log)(ctx, req, info, handler)
+			}),
+	)
 
 	moviegrpc.Register(gRPCServer, log, movieService)
 
