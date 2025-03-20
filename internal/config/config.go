@@ -13,7 +13,7 @@ type Config struct {
 }
 
 type MovieService struct {
-	Env string `yaml:"env" env:"ENV" env-default:"prod"`
+	Env      string `yaml:"env" env:"ENV" env-default:"prod"`
 	HTTPPort uint16 `yaml:"http_port" env:"HTTP_PORT" env-default:"8088"`
 	GRPCPort uint16 `yaml:"grpc_port" env:"GRPC_PORT" env-default:"50051"`
 }
@@ -26,18 +26,18 @@ type Postgres struct {
 	Database string `env:"POSTGRES_DB" env-default:"postgres"`
 }
 
-func Load() (*Config, error) {
+func MustLoad() *Config {
 	const op = "config.MustLoad"
 
 	var cfg Config
 
 	if err := godotenv.Load(); err != nil {
-		return nil, fmt.Errorf("%s: failed to load .env config: %w", op, err)
+		panic(fmt.Errorf("%s: failed to load .env config: %w", op, err))
 	}
 
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
-		return nil, fmt.Errorf("%s: failed to read config from env vars: %w", op, err)
+		panic(fmt.Errorf("%s: failed to read config from env vars: %w", op, err))
 	}
 
-	return &cfg, nil
+	return &cfg
 }
