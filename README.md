@@ -24,8 +24,8 @@ type Movie struct {
 ## 🔥 **API Methods**
 | Method  | Type         | Description |
 |---------|-------------|-------------|
-| `GET`   | Unary & Streaming | Retrieve movie(s) |
-| `POST`  | Unary & Streaming | Create new movie(s) |
+| `GET`   | Unary & Streaming(todo) | Retrieve movie(s) |
+| `POST`  | Unary & Streaming(todo) | Create new movie(s) |
 | `UPDATE` | Unary | Update existing movie |
 | `DELETE` | Unary | Remove movie from database |
 
@@ -60,24 +60,18 @@ Migrations are done by the application itself at startup
 ## 🏰 **Project Structure**
 Following **Clean Architecture**:
 ```
-📺 movie-grpc-api
-├── 📂 api/             # Protobuf contracts
-├── 📂 cmd/             # Application entry point
-├── 📂 internal/
-│   ├── 📂 config/      # Configuration parsing
-│   ├── 📂 model/       # Database models
-│   ├── 📂 repository/  # Data access layer
-│   ├── 📂 service/     # Business logic layer
-│   ├── 📂 transport/   # GRPC & HTTP handlers
-│   │   ├── 📂 dto/     # Data Transfer Objects
-│   │   ├── 📂 grpc/
-├── 📂 migrations/      # DB migration files
-├── 📂 tests/           # Integration & unit tests
-├── 📂 pkg/             # Reusable parts of code
-
-├── Dockerfile
-├── Makefile
-└── README.md
+📂 api/             # Protobuf contracts
+📂 cmd/             # Application entry point
+📂 internal/
+├── 📂 app/         # Main object of application
+├── 📂 config/      # Configuration parsing
+├── 📂 model/       # Database models
+├── 📂 repository/  # Data access layer
+├── 📂 service/     # Business logic layer
+├── 📂 transport/   # GRPC handlers and objects (dto, etc.)
+📂 migrations/      # DB migration files
+📂 tests/           # Integration & unit tests
+📂 pkg/             # Reusable parts of code
 ```
 
 ---
@@ -85,7 +79,7 @@ Following **Clean Architecture**:
 ## 🔍 **Health Check**
 Health check endpoint for GRPC Gateway:
 ```
-GET http://localhost:8080/health
+grpc_health_probe -addr=localhost:${GRPC_PORT}
 ```
 
 ---
