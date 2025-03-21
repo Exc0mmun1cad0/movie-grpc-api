@@ -20,11 +20,11 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	MovieService_CreateMovie_FullMethodName  = "/api.MovieService/CreateMovie"
-	MovieService_CreateMovies_FullMethodName = "/api.MovieService/CreateMovies"
 	MovieService_GetMovie_FullMethodName     = "/api.MovieService/GetMovie"
-	MovieService_GetMovies_FullMethodName    = "/api.MovieService/GetMovies"
 	MovieService_UpdateMovie_FullMethodName  = "/api.MovieService/UpdateMovie"
 	MovieService_DeleteMovie_FullMethodName  = "/api.MovieService/DeleteMovie"
+	MovieService_CreateMovies_FullMethodName = "/api.MovieService/CreateMovies"
+	MovieService_GetMovies_FullMethodName    = "/api.MovieService/GetMovies"
 )
 
 // MovieServiceClient is the client API for MovieService service.
@@ -32,11 +32,12 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MovieServiceClient interface {
 	CreateMovie(ctx context.Context, in *CreateMovieRequest, opts ...grpc.CallOption) (*CreateMovieResponse, error)
-	CreateMovies(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[CreateMovieRequest, CreateMovieResponse], error)
 	GetMovie(ctx context.Context, in *GetMovieRequest, opts ...grpc.CallOption) (*GetMovieResponse, error)
-	GetMovies(ctx context.Context, in *GetMoviesRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetMovieResponse], error)
 	UpdateMovie(ctx context.Context, in *UpdateMovieRequest, opts ...grpc.CallOption) (*UpdateMovieResponse, error)
 	DeleteMovie(ctx context.Context, in *DeleteMovieRequest, opts ...grpc.CallOption) (*DeleteMovieResponse, error)
+	// Streams
+	CreateMovies(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[CreateMovieRequest, CreateMovieResponse], error)
+	GetMovies(ctx context.Context, in *GetMoviesRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetMovieResponse], error)
 }
 
 type movieServiceClient struct {
@@ -57,19 +58,6 @@ func (c *movieServiceClient) CreateMovie(ctx context.Context, in *CreateMovieReq
 	return out, nil
 }
 
-func (c *movieServiceClient) CreateMovies(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[CreateMovieRequest, CreateMovieResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &MovieService_ServiceDesc.Streams[0], MovieService_CreateMovies_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[CreateMovieRequest, CreateMovieResponse]{ClientStream: stream}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type MovieService_CreateMoviesClient = grpc.ClientStreamingClient[CreateMovieRequest, CreateMovieResponse]
-
 func (c *movieServiceClient) GetMovie(ctx context.Context, in *GetMovieRequest, opts ...grpc.CallOption) (*GetMovieResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetMovieResponse)
@@ -79,25 +67,6 @@ func (c *movieServiceClient) GetMovie(ctx context.Context, in *GetMovieRequest, 
 	}
 	return out, nil
 }
-
-func (c *movieServiceClient) GetMovies(ctx context.Context, in *GetMoviesRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetMovieResponse], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &MovieService_ServiceDesc.Streams[1], MovieService_GetMovies_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[GetMoviesRequest, GetMovieResponse]{ClientStream: stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type MovieService_GetMoviesClient = grpc.ServerStreamingClient[GetMovieResponse]
 
 func (c *movieServiceClient) UpdateMovie(ctx context.Context, in *UpdateMovieRequest, opts ...grpc.CallOption) (*UpdateMovieResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -119,16 +88,49 @@ func (c *movieServiceClient) DeleteMovie(ctx context.Context, in *DeleteMovieReq
 	return out, nil
 }
 
+func (c *movieServiceClient) CreateMovies(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[CreateMovieRequest, CreateMovieResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &MovieService_ServiceDesc.Streams[0], MovieService_CreateMovies_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[CreateMovieRequest, CreateMovieResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MovieService_CreateMoviesClient = grpc.ClientStreamingClient[CreateMovieRequest, CreateMovieResponse]
+
+func (c *movieServiceClient) GetMovies(ctx context.Context, in *GetMoviesRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetMovieResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &MovieService_ServiceDesc.Streams[1], MovieService_GetMovies_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[GetMoviesRequest, GetMovieResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MovieService_GetMoviesClient = grpc.ServerStreamingClient[GetMovieResponse]
+
 // MovieServiceServer is the server API for MovieService service.
 // All implementations must embed UnimplementedMovieServiceServer
 // for forward compatibility.
 type MovieServiceServer interface {
 	CreateMovie(context.Context, *CreateMovieRequest) (*CreateMovieResponse, error)
-	CreateMovies(grpc.ClientStreamingServer[CreateMovieRequest, CreateMovieResponse]) error
 	GetMovie(context.Context, *GetMovieRequest) (*GetMovieResponse, error)
-	GetMovies(*GetMoviesRequest, grpc.ServerStreamingServer[GetMovieResponse]) error
 	UpdateMovie(context.Context, *UpdateMovieRequest) (*UpdateMovieResponse, error)
 	DeleteMovie(context.Context, *DeleteMovieRequest) (*DeleteMovieResponse, error)
+	// Streams
+	CreateMovies(grpc.ClientStreamingServer[CreateMovieRequest, CreateMovieResponse]) error
+	GetMovies(*GetMoviesRequest, grpc.ServerStreamingServer[GetMovieResponse]) error
 	mustEmbedUnimplementedMovieServiceServer()
 }
 
@@ -142,20 +144,20 @@ type UnimplementedMovieServiceServer struct{}
 func (UnimplementedMovieServiceServer) CreateMovie(context.Context, *CreateMovieRequest) (*CreateMovieResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMovie not implemented")
 }
-func (UnimplementedMovieServiceServer) CreateMovies(grpc.ClientStreamingServer[CreateMovieRequest, CreateMovieResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method CreateMovies not implemented")
-}
 func (UnimplementedMovieServiceServer) GetMovie(context.Context, *GetMovieRequest) (*GetMovieResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMovie not implemented")
-}
-func (UnimplementedMovieServiceServer) GetMovies(*GetMoviesRequest, grpc.ServerStreamingServer[GetMovieResponse]) error {
-	return status.Errorf(codes.Unimplemented, "method GetMovies not implemented")
 }
 func (UnimplementedMovieServiceServer) UpdateMovie(context.Context, *UpdateMovieRequest) (*UpdateMovieResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateMovie not implemented")
 }
 func (UnimplementedMovieServiceServer) DeleteMovie(context.Context, *DeleteMovieRequest) (*DeleteMovieResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMovie not implemented")
+}
+func (UnimplementedMovieServiceServer) CreateMovies(grpc.ClientStreamingServer[CreateMovieRequest, CreateMovieResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method CreateMovies not implemented")
+}
+func (UnimplementedMovieServiceServer) GetMovies(*GetMoviesRequest, grpc.ServerStreamingServer[GetMovieResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method GetMovies not implemented")
 }
 func (UnimplementedMovieServiceServer) mustEmbedUnimplementedMovieServiceServer() {}
 func (UnimplementedMovieServiceServer) testEmbeddedByValue()                      {}
@@ -196,13 +198,6 @@ func _MovieService_CreateMovie_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MovieService_CreateMovies_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(MovieServiceServer).CreateMovies(&grpc.GenericServerStream[CreateMovieRequest, CreateMovieResponse]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type MovieService_CreateMoviesServer = grpc.ClientStreamingServer[CreateMovieRequest, CreateMovieResponse]
-
 func _MovieService_GetMovie_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetMovieRequest)
 	if err := dec(in); err != nil {
@@ -220,17 +215,6 @@ func _MovieService_GetMovie_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	return interceptor(ctx, in, info, handler)
 }
-
-func _MovieService_GetMovies_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(GetMoviesRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(MovieServiceServer).GetMovies(m, &grpc.GenericServerStream[GetMoviesRequest, GetMovieResponse]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type MovieService_GetMoviesServer = grpc.ServerStreamingServer[GetMovieResponse]
 
 func _MovieService_UpdateMovie_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateMovieRequest)
@@ -267,6 +251,24 @@ func _MovieService_DeleteMovie_Handler(srv interface{}, ctx context.Context, dec
 	}
 	return interceptor(ctx, in, info, handler)
 }
+
+func _MovieService_CreateMovies_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MovieServiceServer).CreateMovies(&grpc.GenericServerStream[CreateMovieRequest, CreateMovieResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MovieService_CreateMoviesServer = grpc.ClientStreamingServer[CreateMovieRequest, CreateMovieResponse]
+
+func _MovieService_GetMovies_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetMoviesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(MovieServiceServer).GetMovies(m, &grpc.GenericServerStream[GetMoviesRequest, GetMovieResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MovieService_GetMoviesServer = grpc.ServerStreamingServer[GetMovieResponse]
 
 // MovieService_ServiceDesc is the grpc.ServiceDesc for MovieService service.
 // It's only intended for direct use with grpc.RegisterService,
