@@ -2,13 +2,38 @@ syntax = "proto3";
 package api;
 option go_package = "pkg/pb";
 
+import "google/api/annotations.proto";
+
 service MovieService {
-  rpc CreateMovie(CreateMovieRequest) returns (CreateMovieResponse);
+  rpc CreateMovie(CreateMovieRequest) returns (CreateMovieResponse) {
+    option (google.api.http) = {
+      post: "/api/movie"
+      body: "*"
+    };
+  }
+
+  rpc GetMovie(GetMovieRequest) returns (GetMovieResponse) {
+    option (google.api.http) = {
+      get: "/api/movie/{id}"
+    };
+  }
+
+  rpc UpdateMovie(UpdateMovieRequest) returns (UpdateMovieResponse) {
+    option (google.api.http) = {
+      put: "/api/movie/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteMovie(DeleteMovieRequest) returns (DeleteMovieResponse) {
+    option (google.api.http) = {
+      delete: "/api/movie/{id}"
+    };
+  }
+
+  // Streams
   rpc CreateMovies(stream CreateMovieRequest) returns (CreateMovieResponse);
-  rpc GetMovie(GetMovieRequest) returns (GetMovieResponse);
   rpc GetMovies(GetMoviesRequest) returns (stream GetMovieResponse);
-  rpc UpdateMovie(UpdateMovieRequest) returns (UpdateMovieResponse);
-  rpc DeleteMovie(DeleteMovieRequest) returns (DeleteMovieResponse);
 }
 
 message Movie {
