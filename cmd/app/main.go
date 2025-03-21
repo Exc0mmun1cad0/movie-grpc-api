@@ -37,7 +37,11 @@ func main() {
 	log.Info("connected to postgres")
 
 	log.Info("initializing app")
-	application := app.New(ctx, log, cfg.MovieService, db)
+	application, err := app.New(ctx, log, cfg.MovieService, db)
+	if err != nil {
+		log.Error("failed to init app", sl.Err(err))
+		os.Exit(1)
+	}
 
 	// Graceful shutdown
 	stop := make(chan os.Signal, 1)
@@ -45,13 +49,19 @@ func main() {
 
 	log.Info("started app")
 	go application.GRPCServer.MustRun()
+	go application.GRPCGateway.MustRun()
 
 	<-stop
 	log.Info("stopping app")
 
 	application.GRPCServer.Stop()
+	log.Info("grpc server stopped")
+
+	application.GRPCGateway.Stop()
+	log.Info("grpc gateway stopped")
 
 	postgres.MustClose(db)
+	log.Info("closed connection to postgres db")
 
-	log.Info("app stopped")
+	log.Info("stopped app")
 }
