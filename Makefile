@@ -1,7 +1,8 @@
 generate-proto:
-	@protoc -I ./api \
+	@protoc -I ./api -I ./api/google \
 	--go_out=./pkg/pb --go_opt=paths=source_relative \
 	--go-grpc_out=./pkg/pb --go-grpc_opt=paths=source_relative \
+	--grpc-gateway_out=./pkg/pb --grpc-gateway_opt=paths=source_relative \
 	./api/movie.proto
 
 lint:
