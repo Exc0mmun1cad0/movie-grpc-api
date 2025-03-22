@@ -13,3 +13,9 @@ build:
 
 run:
 	@go run cmd/app/main.go
+
+compose-up:
+	docker compose up -d
+
+compose-down:
+	docker compose down --remove-orphans

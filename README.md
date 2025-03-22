@@ -78,8 +78,17 @@ Following **Clean Architecture**:
 
 ## 🔍 **Health Check**
 Health check endpoint for GRPC Gateway:
-```
+```bash
 grpc_health_probe -addr=localhost:${GRPC_PORT}
 ```
 
 ---
+
+## 🐳 **Running with Docker"
+```bash
+docker compose up -d
+```
+OR
+```bash
+make compose-up
+```
