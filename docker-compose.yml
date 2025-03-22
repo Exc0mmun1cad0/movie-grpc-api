@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+  movie-service:
+    container_name: movie_service
+    build: .
+    env_file: 
+      - .env
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"
+      - "${HTTP_PORT}:${HTTP_PORT}"
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-addr=movie-service:${GRPC_PORT}"]
+      interval: 45s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      - postgres
+    networks:
+      - backend
+    restart: unless-stopped
+
   postgres:
     container_name: postgres_container
     image: postgres:17.4-bookworm
@@ -31,12 +50,10 @@ services:
       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
       PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_CONFIG_SERVER_MODE: 'False'
-    env_file:
-      - .env
     volumes:
       - pgadmin:/var/lib/postgres
     ports:
-      - "${PGADMIN_PORT}:80"
+      - "5050:80"
     depends_on:
       - postgres
     networks:

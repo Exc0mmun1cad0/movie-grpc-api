@@ -37,7 +37,7 @@ Service reads configuration from a `.env` file. Example from `.env.example`:
 ENV=prod                            # app environment
 GRPC_PORT=50051                     # grpc server port
 HTTP_PORT=8080                      # http server (grpc-gateway) port
-POSTGRES_HOST=localhost             # host of db Postgres
+POSTGRES_HOST=postgres              # host of db Postgres in docker network
 POSTGRES_PORT=5432                  # port of db Postgres
 POSTGRES_USER=your_user             # username for Postgres connection
 POSTGRES_PASSWORD=your_password     # password for Postgres connection
