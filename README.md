@@ -84,7 +84,7 @@ grpc_health_probe -addr=localhost:${GRPC_PORT}
 
 ---
 
-## 🐳 **Running with Docker"
+## 🐳 **Running with Docker**
 ```bash
 docker compose up -d
 ```
