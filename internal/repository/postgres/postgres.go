@@ -12,6 +12,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 )
 
+const (
+	defaultCreateBatch = 50
+)
+
 type Repository struct {
 	db      *sqlx.DB
 	builder sq.StatementBuilderType
@@ -89,7 +93,49 @@ func (r *Repository) CreateMovie(movie *model.Movie) (string, error) {
 }
 
 func (r *Repository) CreateMovies(movies []model.Movie) ([]string, error) {
-	const op = "repository.postgres.CreateMovies"
+	const op = "repository.postgres.CreateMovie"
+
+	// Begin transaction
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to begin transaction: %w", op, err)
+	}
+
+	// Intercept non-nil error and rollback whole transaction
+	defer func() {
+		if err != nil {
+			errRb := tx.Rollback()
+			if errRb != nil {
+				err = fmt.Errorf("%s: error during rollback: %w", op, err)
+				return
+			}
+
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	// Alternately, insert all batches
+	createdIDs := make([]string, 0, len(movies))
+	for i := range movies {
+		endOfBatch := i + defaultCreateBatch
+		if endOfBatch > len(movies) {
+			endOfBatch = len(movies)
+		}
+
+		idsBatch, err := r.createMovies(tx, movies[i:endOfBatch])
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to insert batch of movies: %w", op, err)
+		}
+
+		createdIDs = append(createdIDs, idsBatch...)
+	}
+
+	return createdIDs, nil
+}
+
+func (r *Repository) createMovies(tx *sqlx.Tx, movies []model.Movie) ([]string, error) {
+	const op = "repository.postgres.createMovies"
 
 	builder := r.builder.Insert("movies").Columns("title", "genre", "director", "year")
 	for _, movie := range movies {
@@ -103,7 +149,7 @@ func (r *Repository) CreateMovies(movies []model.Movie) ([]string, error) {
 	}
 
 	var movieIDs []string
-	err = r.db.Select(&movieIDs, query, args...)
+	err = tx.Select(&movieIDs, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to add info about movies: %w", op, err)
 	}
