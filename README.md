@@ -24,8 +24,8 @@ type Movie struct {
 ## 🔥 **API Methods**
 | Method  | Type         | Description |
 |---------|-------------|-------------|
-| `GET`   | Unary & Streaming(todo) | Retrieve movie(s) |
-| `POST`  | Unary & Streaming(todo) | Create new movie(s) |
+| `GET`   | Unary & Streaming | Retrieve movie(s) |
+| `POST`  | Unary & Streaming | Create new movie(s) |
 | `UPDATE` | Unary | Update existing movie |
 | `DELETE` | Unary | Remove movie from database |
 
@@ -85,10 +85,6 @@ grpc_health_probe -addr=localhost:${GRPC_PORT}
 ---
 
 ## 🐳 **Running with Docker**
-```bash
-docker compose up -d
-```
-OR
 ```bash
 make compose-up
 ```

@@ -5,5 +5,5 @@ type Movie struct {
 	Title    string `db:"title"`
 	Genre    string `db:"genre"`
 	Director string `db:"director"`
-	Year     uint32   `db:"year"`
+	Year     uint32 `db:"year"`
 }

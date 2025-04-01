@@ -3,6 +3,7 @@ package moviegrpc
 import (
 	"context"
 	"errors"
+	"io"
 	"log/slog"
 	"movie-service/internal/model"
 	repo "movie-service/internal/repository"
@@ -181,4 +182,71 @@ func (srv *server) DeleteMovie(ctx context.Context, in *pb.DeleteMovieRequest) (
 	}
 
 	return &pb.DeleteMovieResponse{Success: ok}, nil
+}
+
+func (srv *server) GetMovies(in *pb.GetMoviesRequest, stream pb.MovieService_GetMoviesServer) error {
+	const op = "transport.grpc.GetMovies"
+	ctx := stream.Context()
+
+	log := srv.l.With(
+		slog.String("op", op),
+		slog.Any("request_id", ctx.Value(reqIDKey)),
+	)
+
+	log.Debug("Getting all movies info from db")
+	// TODO: change for dynamic reading (get rid of variant all-movies-in-slice)
+	movies, err := srv.service.GetMovies()
+	if err != nil {
+		log.Error("Failed to get info about all movies", sl.Err(err))
+
+		return nil
+	}
+
+	log.Debug("Starting stream...")
+	for _, movie := range movies {
+		if err := stream.Send(&pb.GetMovieResponse{Movie: toPb(&movie)}); err != nil {
+			log.Error("Error during streaming movies")
+			return err
+		}
+	}
+	log.Debug("Finished stream")
+
+	return nil
+}
+
+func (srv *server) CreateMovies(stream pb.MovieService_CreateMoviesServer) error {
+	const op = "transport.grpc.CreateMovies"
+	ctx := stream.Context()
+
+	log := srv.l.With(
+		slog.String("op", op),
+		slog.Any("request_id", ctx.Value(reqIDKey)),
+	)
+
+	ids := make([]string, 0)
+
+	for {
+		pbNewMovie, err := stream.Recv()
+		if err == io.EOF {
+			return stream.SendAndClose(&pb.CreateMoviesResponse{
+				Ids: ids,
+			})
+		}
+
+		if err != nil {
+			log.Error("Failed to get movie info from stream")
+			return err
+		}
+
+		newMovie := pbToCreate(pbNewMovie)
+
+		id, err := srv.service.CreateMovie(newMovie.ToModel())
+		if err != nil {
+			log.Error("Failed to save new movie info")
+			return err
+		}
+		log.Debug("Inserted new movie to db", slog.String("id", id))
+
+		ids = append(ids, id)
+	}
 }

@@ -32,7 +32,7 @@ service MovieService {
   }
 
   // Streams
-  rpc CreateMovies(stream CreateMovieRequest) returns (CreateMovieResponse);
+  rpc CreateMovies(stream CreateMovieRequest) returns (CreateMoviesResponse);
   rpc GetMovies(GetMoviesRequest) returns (stream GetMovieResponse);
 }
 
@@ -53,6 +53,10 @@ message CreateMovieRequest {
 
 message CreateMovieResponse {
   string id = 1;
+}
+
+message CreateMoviesResponse {
+  repeated string ids = 1;
 }
 
 message GetMovieRequest {
