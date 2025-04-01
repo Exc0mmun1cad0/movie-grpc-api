@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"movie-service/pkg/sl"
+	"time"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
@@ -34,12 +35,20 @@ func LoggingUnaryInterceptor(log *slog.Logger) grpc.UnaryServerInterceptor {
 
 		// Pass it to handler through the context
 		ctx = context.WithValue(ctx, reqIDKey, requestID)
+		var m any
+		start := time.Now()
+
+		defer func() {
+			log.Info(
+				"Request completed",
+				slog.Any("Response", m),
+				slog.String("duration", time.Since(start).String()),
+			)
+		}()
 
 		m, err := handler(ctx, req)
 		if err != nil {
 			log.Error("Failed to handle request", sl.Err(err))
-		} else {
-			log.Info("Handled request", slog.Any("Response", m))
 		}
 
 		return m, err
@@ -72,7 +81,15 @@ func LoggingStreamInterceptor(log *slog.Logger) grpc.StreamServerInterceptor {
 			ctx:          ctx,
 		}
 
-		log.Info("Starting stream...")
+		start := time.Now()
+
+		defer func() {
+			log.Info(
+				"Stream request completed",
+				slog.String("duration", time.Since(start).String()),
+			)
+		}()
+
 		err := handler(srv, wrappedStream)
 		if err != nil {
 			log.Error("Failed to sream response", sl.Err(err))
