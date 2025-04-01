@@ -3,6 +3,7 @@ package moviegrpc
 import (
 	"context"
 	"log/slog"
+	"movie-service/pkg/sl"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
@@ -14,7 +15,7 @@ const (
 	reqIDKey key = "request_id"
 )
 
-func LoggingInterceptor(log *slog.Logger) grpc.UnaryServerInterceptor {
+func LoggingUnaryInterceptor(log *slog.Logger) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		req any,
@@ -26,7 +27,7 @@ func LoggingInterceptor(log *slog.Logger) grpc.UnaryServerInterceptor {
 		log := log.With(slog.String(string(reqIDKey), requestID))
 
 		log.Info(
-			"Got new request",
+			"Got new unary request",
 			slog.String("Method", info.FullMethod),
 			slog.Any("Body", req),
 		)
@@ -35,12 +36,59 @@ func LoggingInterceptor(log *slog.Logger) grpc.UnaryServerInterceptor {
 		ctx = context.WithValue(ctx, reqIDKey, requestID)
 
 		m, err := handler(ctx, req)
-
-		log.Info(
-			"Handled request",
-			slog.Any("Response", m),
-		)
+		if err != nil {
+			log.Error("Failed to handle request", sl.Err(err))
+		} else {
+			log.Info("Handled request", slog.Any("Response", m))
+		}
 
 		return m, err
 	}
+}
+
+func LoggingStreamInterceptor(log *slog.Logger) grpc.StreamServerInterceptor {
+	return func(
+		srv any,
+		ss grpc.ServerStream,
+		info *grpc.StreamServerInfo,
+		handler grpc.StreamHandler,
+	) error {
+		// Generate request ID
+		requestID := uuid.New().String()
+		log := log.With(slog.String(string(reqIDKey), requestID))
+
+		log.Info(
+			"Got new stream request",
+			slog.String("Method", info.FullMethod),
+			slog.Any("Body", srv),
+		)
+
+		// Create new context with request ID inside
+		ctx := ss.Context()
+		ctx = context.WithValue(ctx, reqIDKey, requestID)
+
+		wrappedStream := &serverStreamWrapper{
+			ServerStream: ss,
+			ctx:          ctx,
+		}
+
+		log.Info("Starting stream...")
+		err := handler(srv, wrappedStream)
+		if err != nil {
+			log.Error("Failed to sream response", sl.Err(err))
+		} else {
+			log.Info("Finished stream")
+		}
+
+		return nil
+	}
+}
+
+type serverStreamWrapper struct {
+	ctx context.Context
+	grpc.ServerStream
+}
+
+func (w *serverStreamWrapper) Context() context.Context {
+	return w.ctx
 }
