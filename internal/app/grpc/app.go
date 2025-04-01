@@ -28,14 +28,24 @@ func New(ctx context.Context, log *slog.Logger, movieService moviegrpc.Service, 
 				info *grpc.UnaryServerInfo,
 				handler grpc.UnaryHandler,
 			) (resp any, err error) {
-				return moviegrpc.LoggingInterceptor(log)(ctx, req, info, handler)
-			}),
+				return moviegrpc.LoggingUnaryInterceptor(log)(ctx, req, info, handler)
+			},
+		),
+		grpc.StreamInterceptor(
+			func(
+				srv any, 
+				ss grpc.ServerStream, 
+				info *grpc.StreamServerInfo, 
+				handler grpc.StreamHandler,
+			) error {
+				return moviegrpc.LoggingStreamInterceptor(log)(srv, ss, info, handler)
+			},
+		),
 	)
 
 	// Register movie service
 	moviegrpc.Register(gRPCServer, log, movieService)
 
-	// TODO: add healthcheck
 	// Register health check service
 	healthServer := health.NewServer()
 	grpc_health_v1.RegisterHealthServer(gRPCServer, healthServer)
